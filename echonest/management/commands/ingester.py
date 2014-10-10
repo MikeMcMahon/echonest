@@ -33,7 +33,6 @@ class Command(BaseCommand):
             print "Ingesting file {0}".format(f)
             codes, bigeval = parse_json_dump(os.path.join(settings.INGESTER_JSON_DIR, f))
             fp.ingest(codes, do_commit=False)
-        else:
             print "Commiting to database!"
             fp.commit()
-            self.backup(files)
+            self.backup([f])
