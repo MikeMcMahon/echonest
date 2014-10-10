@@ -89,3 +89,5 @@ INGESTER_API_DIR = '/root/echoprint-server/'
 
 INGESTER_JSON_DIR = os.path.join(INGESTER_HOME_DIR, 'json-ingest')
 INGESTER_BACK_DIR = os.path.join(INGESTER_HOME_DIR, '.json-backup')
+
+UPLOADS_DIR = '/data/uploads/'
