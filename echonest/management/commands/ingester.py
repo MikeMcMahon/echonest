@@ -17,10 +17,8 @@ import fp
 class Command(BaseCommand):
 
     def backup(self, files):
-        stamp = datetime.datetime.now().strftime('%Y-%m-%dT%H:%MZ')
-
         for f in files:
-            dst = os.path.join(settings.INGESTER_BACK_DIR, "{0}-{1}".format(stamp, f))
+            dst = os.path.join(settings.INGESTER_BACK_DIR, f)
             src = os.path.join(settings.INGESTER_JSON_DIR, f)
             print "Moving {0} to {1}".format(src,  dst)
             shutil.move(src, dst)
