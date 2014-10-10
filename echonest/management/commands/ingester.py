@@ -10,7 +10,7 @@ from echonest import settings
 sys.path.insert(0, os.path.join(settings.INGESTER_API_DIR, 'API'))
 sys.path.insert(0, os.path.join(settings.INGESTER_API_DIR, 'util'))
 
-import fastingest
+from fastingest import parse_json_dump
 import fp
 
 
