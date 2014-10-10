@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
         for f in files:
             print "Ingesting file {0}".format(f)
-            codes, bigeval = parse_json_dump(os.path.join(INGESTER_JSON_DIR, f))
+            codes, bigeval = parse_json_dump(os.path.join(settings.INGESTER_JSON_DIR, f))
             fp.ingest(codes, do_commit=False)
         else:
             print "Commiting to database!"
