@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form method="post" action="." id="uploader" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="file" id="input_file" name="input_file" multiple />
-    <br />
-    <input type="submit" />
-</form>
+    <form method="post" action="." id="uploader" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" id="input_file" name="input_file" multiple />
+        <br />
+        <input type="submit" />
+    </form>
 
     {% if rejected_files %}
         <h2>Rejected Files</h2>
@@ -16,5 +16,4 @@
         {% endfor %}
         </ul>
     {% endif %}
-
 {% endblock %}

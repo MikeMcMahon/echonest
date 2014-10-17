@@ -23,7 +23,7 @@ def ingester(request):
     if request.method == 'POST':
         input_files = request.FILES.getlist('input_file')
         for f in input_files:
-            if f.endswisth('.json'):
+            if f.name.endswisth('.json'):
                 uploaded_files.append(handle_upload_file(f))
             else:
                 rejected_files.append(f)
