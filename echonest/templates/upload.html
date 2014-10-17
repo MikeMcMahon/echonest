@@ -1,16 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends "base.html" %}
 
+{% block content %}
 <form method="post" action="." id="uploader" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="file" id="input_file" name="input_file" multiple />
     <br />
     <input type="submit" />
 </form>
-</body>
-</html>
+
+    {% if rejected_files %}
+        <h2>Rejected Files</h2>
+        <ul>
+        {% for f in rejected_files %}
+            <li>f</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock %}
