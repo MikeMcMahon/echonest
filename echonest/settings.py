@@ -83,7 +83,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-
 INGESTER_HOME_DIR = '/data/home/steveo/'
 INGESTER_API_DIR = '/root/echoprint-server/'
 
@@ -91,3 +90,7 @@ INGESTER_JSON_DIR = os.path.join(INGESTER_HOME_DIR, 'json-ingest')
 INGESTER_BACK_DIR = os.path.join(INGESTER_HOME_DIR, '.json-backup')
 
 UPLOADS_DIR = '/data/uploads/'
+
+REMOTE_ENABLED = True
+REMOTE_API_URL = 'http://pimp3d69-echoprint.cloudapp.net:8080/query?fp_code='
+REMOTE_SOLR_URL = 'http://pimp3d69-echoprint.cloudapp.net:8502/solr/fp/select/?q=track_id:{0}*'

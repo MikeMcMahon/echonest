@@ -8,11 +8,21 @@
         <input type="submit" />
     </form>
 
-    {% if rejected_files %}
+    {% if uploaded %}
+        <h2>Uploaded Files / Codes</h2>
+        <ul>
+            {% for f in uploaded %}
+                <li>{{ f.filename }}
+                    {% if f.match %}- <a href="{{ f.solr_url }}" target="_blank">{{ f.track_id }}</a>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if rejected %}
         <h2>Rejected Files</h2>
         <ul>
-        {% for f in rejected_files %}
-            <li>f</li>
+        {% for f in rejected %}
+            <li>{{ f.name }}</li>
         {% endfor %}
         </ul>
     {% endif %}
