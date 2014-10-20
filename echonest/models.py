@@ -4,7 +4,7 @@ from echonest import settings
 
 
 class Ingested(models.Model):
-    filename = models.FilePathField()
+    filename = models.TextField(max_length=1000)
     code = models.TextField()
     uploaded_on = models.DateField(default=datetime.datetime.now().date())
     last_attempt = models.DateField(default=datetime.datetime.now().date())
