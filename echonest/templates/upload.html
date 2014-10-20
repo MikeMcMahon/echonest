@@ -1,13 +1,26 @@
 {% extends "base.html" %}
-
 {% block content %}
-    <form method="post" action="." id="uploader" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="file" id="input_file" name="input_file" multiple />
-        <br />
-        <input type="submit" />
-    </form>
-
+    <div class="row">
+        <h3>Ingest JSON files generated from codegen here</h3>
+        <div class="col-xs-6 col-xs-offset-3">
+            {% if rejected %}
+                <div class="alert alert-danger">
+                    <strong>Oh Shit Son</strong>... It looks like some JSONS are gay.
+                </div>
+            {% endif %}
+            <div class="panel panel-default">
+                <form method="post" action="." id="uploader" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="input_file">Ingestable Files</label>
+                        <input type="file" id="input_file" name="input_file" multiple />
+                    </div>
+                    <br />
+                    <input type="submit" class="btn btn-default btn-block" />
+                </form>
+            </div>
+        </div>
+    </div>
     {% if uploaded %}
         <h2>Uploaded Files / Codes</h2>
         <ul>
