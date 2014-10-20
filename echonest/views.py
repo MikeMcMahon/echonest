@@ -1,11 +1,12 @@
 import json
-from multiprocessing.pool import Pool
 import os
-import urllib2
+
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
+
 from echonest import settings
+from echonest.controllers.ingest import process
 from echonest.models import Ingested
 
 
@@ -21,11 +22,12 @@ def handle_upload_file(f):
 @csrf_protect
 @never_cache
 def ingester(request):
-    uploaded_files = []
-    uploaded_codes = []
     rejected_files = []
+    uploaded_codes = []
+    success = []
 
     if request.method == 'POST':
+        uploaded_files = []
         input_files = request.FILES.getlist('input_file')
         for f in input_files:
             if f.name.endswith('.json'):
@@ -54,25 +56,33 @@ def ingester(request):
             ingested.filename = f['metadata']['filename']
             ingested.code = f['code']
             track_id = process(ingested)
+
             if track_id is not None:
                 ingested.match = True
                 ingested.track_id = track_id
+                success.append(ingested)
+            else:
+                uploaded_codes.append(ingested)
 
             ingested.save()
-            uploaded_codes.append(ingested)
 
     return render(request, 'upload.html', {
         'uploaded': uploaded_codes,
-        'rejected': rejected_files
+        'success': success,
+        'rejected': rejected_files,
     })
 
 
-def process(ingest):
-    json_data = ''
-    if settings.REMOTE_ENABLED:
-        scraped = urllib2.urlopen(settings.REMOTE_API_URL + ingest.code)
-        json_data = json.loads(scraped.read())
+def song_listing(request, reason):
+    match = True
+    title = 'Matched Track Information'
+    if reason == 'unmatched':
+        match = False
+        title = 'Unmatched Track Information'
 
-    ingest.match = True
-    ingest.save()
-    return json_data['track_id']
+    ingested = Ingested.objects.filter(match=match)
+
+    return render(request, 'songlisting.html', {
+        'title': title,
+        'songs': ingested
+    })
