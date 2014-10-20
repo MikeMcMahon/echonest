@@ -80,7 +80,7 @@ def song_listing(request, reason):
         match = False
         title = 'Unmatched Track Information'
 
-    ingested = Ingested.objects.filter(match=match)
+    ingested = Ingested.objects.filter(match=match).orderby('uploaded_on')
 
     return render(request, 'songlisting.html', {
         'title': title,
