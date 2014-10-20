@@ -1,42 +1,60 @@
 {% extends "base.html" %}
 {% block content %}
+    <h3>Ingest JSON files generated from codegen here</h3>
     <div class="row">
-        <h3>Ingest JSON files generated from codegen here</h3>
-        <div class="col-xs-6 col-xs-offset-3">
+        <div class="col-sm-12 col-md-6 col-md-offset-3">
             {% if rejected %}
                 <div class="alert alert-danger">
                     <strong>Oh Shit Son</strong>... It looks like some JSONS are gay.
                 </div>
             {% endif %}
             <div class="panel panel-default">
-                <form method="post" action="." id="uploader" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="input_file">Ingestable Files</label>
-                        <input type="file" id="input_file" name="input_file" multiple />
-                    </div>
-                    <br />
-                    <input type="submit" class="btn btn-default btn-block" />
-                </form>
+                <div class="panel-heading">Upload your JSON</div>
+                <div class="panel-body">
+                    <form method="post" action="." id="uploader" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="input_file">Ingestable Files</label>
+                            <input type="file" id="input_file" name="input_file" multiple/>
+                        </div>
+                        <br/>
+                        <input type="submit" class="btn btn-default btn-block"/>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-    {% if uploaded %}
-        <h2>Uploaded Files / Codes</h2>
-        <ul>
-            {% for f in uploaded %}
-                <li>{{ f.filename }}
-                    {% if f.match %}- <a href="{{ f.solr_url }}" target="_blank">{{ f.track_id }}</a>{% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% if rejected %}
-        <h2>Rejected Files</h2>
-        <ul>
-        {% for f in rejected %}
-            <li>{{ f.name }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+    <div class="row">
+        <div class="col-sm-4">
+            {% if success %}
+                <h4>Succesful Matches</h4>
+                <div class="list-group">
+                    {% for s in success %}
+                        <a href="{{ s.solr_url }}" class="list-group-item list-group-item-success"
+                           target="_blank">{{ s.track_id }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-sm-4">
+            {% if uploaded %}
+                <h4>Unable to match</h4>
+                <ul class="list-group">
+                    {% for f in uploaded %}
+                        <li class="list-group-item">{{ f.filename }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div class="col-sm-4">
+            {% if rejected %}
+                <h4>Rejected Files</h4>
+                <ul class="list-group">
+                    {% for f in rejected %}
+                        <li class="list-group-item list-group-item-danger">{{ f.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
