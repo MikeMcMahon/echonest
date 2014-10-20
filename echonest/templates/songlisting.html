@@ -6,6 +6,8 @@
             <table class="table table-condensed table-responsive table-striped table-hover">
                 <thead>
                 <tr>
+                    <td>Uploaded</td>
+                    <td>Last Attempt</td>
                     <td>Filename</td>
                     <td></td>
                     <td></td>
@@ -15,6 +17,8 @@
                 <tbody>
                 {% for s in songs %}
                     <tr>
+                        <td>{{ s.uploaded_on }}</td>
+                        <td>{{ s.last_attempt }}</td>
                         <td>{{ s.filename }}</td>
                         <td>{{ s.track_id }}</td>
                         <td>{% if s.match %}
