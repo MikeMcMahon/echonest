@@ -56,13 +56,21 @@ WSGI_APPLICATION = 'echonest.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+if os.environ.get('PRODUCTION', None):
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'echonest',
+        'USER': os.environ.get('DBUSER', None),
+        'PASSWORD': os.environ.get('DBPASS', None),
+        'HOST': 'localhost'
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
