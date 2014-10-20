@@ -76,11 +76,13 @@ def ingester(request):
 def song_listing(request, reason):
     match = True
     title = 'Matched Track Information'
+    order_by = '-uploaded_on'
     if reason == 'unmatched':
         match = False
         title = 'Unmatched Track Information'
+        order_by = '-last_attempt'
 
-    ingested = Ingested.objects.filter(match=match).order_by('-uploaded_on')
+    ingested = Ingested.objects.filter(match=match).order_by(order_by)
 
     return render(request, 'songlisting.html', {
         'title': title,
