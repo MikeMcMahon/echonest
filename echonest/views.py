@@ -37,11 +37,20 @@ def ingester(request):
         json_to_parse = []
         for f in uploaded_files:
             with open(f[1], 'rb') as input_json_file:
-                input_json = json.load(input_json_file)
-                json_to_parse = json_to_parse + input_json
+                try:
+                    input_json = json.load(input_json_file)
+                except:
+                    rejected_files.append(f)
+                else:
+                    json_to_parse = json_to_parse + input_json
 
         for f in json_to_parse:
             ingested = Ingested()
+
+            if 'metadata' not in f or 'filename' not in f['metadata'] or 'code' not in f:
+                rejected_files.append({'name': 'failed to process json file, missing required fields'})
+                continue
+
             ingested.filename = f['metadata']['filename']
             ingested.code = f['code']
             track_id = process(ingested)
