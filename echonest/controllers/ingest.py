@@ -7,6 +7,8 @@ import urllib2
 import time
 from echonest import settings
 
+import fp
+
 
 def process(ingest, retry=0):
     json_data = {'track_id': None}
@@ -20,5 +22,8 @@ def process(ingest, retry=0):
                 return process(ingest, retry)
         else:
             json_data = json.loads(scraped.read())
+    else:
+        response = fp.best_match_for_query(ingest.code)
+        json_data['track_id'] = response.TRID
 
     return json_data['track_id']
