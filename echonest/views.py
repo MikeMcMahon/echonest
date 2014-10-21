@@ -42,7 +42,7 @@ def ingester(request):
                 try:
                     input_json = json.load(input_json_file)
                 except:
-                    rejected_files.append(f)
+                    rejected_files.append(f[0])
                 else:
                     json_to_parse = json_to_parse + input_json
 
