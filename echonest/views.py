@@ -1,5 +1,7 @@
 import json
 import os
+import datetime
+from django.http import HttpResponse
 
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
@@ -73,6 +75,8 @@ def ingester(request):
     })
 
 
+@never_cache
+@csrf_protect
 def song_listing(request, reason):
     match = True
     title = 'Matched Track Information'
@@ -88,3 +92,29 @@ def song_listing(request, reason):
         'title': title,
         'songs': ingested
     })
+
+
+@never_cache
+@csrf_protect
+def retry(request, ingested_id):
+    ingested = Ingested.objects.filter(id=ingested_id)
+    if len(ingested) != 1:
+        return HttpResponse(json.dumps({'status': 'too many or too few matching songs'}))
+    else:
+        ingested = ingested[0]
+
+    track_id = process(ingested)
+
+    if track_id is not None:
+        ingested.track_id = track_id
+        ingested.match = True
+
+    ingested.last_attempt = datetime.datetime.now().date()
+    ingested.save()
+
+    return HttpResponse(json.dumps({
+        'track_id': track_id,
+        'solr_url': ingested.solr_url(),
+        'last_attempt': ingested.last_attempt.strftime('%b. %d, %Y'),
+        'status': 'success' if track_id is not None else 'failed',
+        }))

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="row">
+        {% csrf_token %}
         <div class="col-md-12">
             <h3>{{ title }}</h3>
             <table class="table table-condensed table-responsive table-striped table-hover">
@@ -18,18 +19,50 @@
                 {% for s in songs %}
                     <tr>
                         <td>{{ s.uploaded_on }}</td>
-                        <td>{{ s.last_attempt }}</td>
+                        <td id="la_{{ s.id }}">{{ s.last_attempt }}</td>
                         <td>{{ s.filename }}</td>
-                        <td>{{ s.track_id }}</td>
-                        <td>{% if s.match %}
-                            <a href="{{ s.solr_url }}" target="_blank">View</a>
+                        <td id="trid_{{ s.id }}" >{{ s.track_id }}</td>
+                        <td id="match_{{ s.id }}">{% if s.match %}
+                            <a href="{{ s.solr_url }}" target="_blank" title="View In Solr"><span class="glyphicon glyphicon-new-window"></span></a>
                         {% endif %}
                         </td>
-                        <td>{% if not s.match %}<a href="/retry/{{ s.id }}">Retry</a>{% endif %}</td>
+                        <td>{% if not s.match %}<a onclick="retry(this, '{{ s.id }}')" href="javascript://" title="Retry">
+                            <span class="glyphicon glyphicon-repeat"></span></a>{% endif %}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+    <script type="text/javascript">
+        function retry(obj, ingested_id) {
+            var csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+            $(obj).parent().parent().addClass('active');
+            $.ajax({
+                url: '/retry/' + ingested_id,
+                type: 'POST',
+                data: {csrfmiddlewaretoken: csrftoken}
+            }).done(function (data) {
+                $(obj).parent().parent().removeClass('active');
+                $(obj).parent().parent().removeClass('success');
+                $(obj).parent().parent().removeClass('danger');
+                var results = JSON.parse(data);
+                if (results['status'] === 'success') {
+                    $(obj).parent().parent().addClass('success');
+                    $("#trid_" + ingested_id).text(results['track_id']);
+                    $("#match_" + ingested_id).html(
+                            '<a href="' + results['solr_url'] + '" target="_blank"><span class="glyphicon glyphicon-new-window"></span></a>');
+                } else {
+                    $(obj).parent().parent().addClass('danger');
+                }
+
+                $("#la_" + ingested_id).text(results['last_attempt']);
+            }).error(function() {
+                $(obj).parent().parent().removeClass('active');
+                $(obj).parent().parent().removeClass('success');
+                $(obj).parent().parent().removeClass('danger');
+                $(obj).parent().parent().addClass('warning');
+            });
+        }
+    </script>
 {% endblock %}
