@@ -37,13 +37,13 @@
     <script type="text/javascript">
         function retry(obj, ingested_id) {
             var csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-            $(obj).parent().parent().addClass('active');
+            $(obj).parent().parent().addClass('info');
             $.ajax({
                 url: '/retry/' + ingested_id,
                 type: 'POST',
                 data: {csrfmiddlewaretoken: csrftoken}
             }).done(function (data) {
-                $(obj).parent().parent().removeClass('active');
+                $(obj).parent().parent().removeClass('info');
                 $(obj).parent().parent().removeClass('success');
                 $(obj).parent().parent().removeClass('danger');
                 var results = JSON.parse(data);
@@ -58,7 +58,7 @@
 
                 $("#la_" + ingested_id).text(results['last_attempt']);
             }).error(function() {
-                $(obj).parent().parent().removeClass('active');
+                $(obj).parent().parent().removeClass('info');
                 $(obj).parent().parent().removeClass('success');
                 $(obj).parent().parent().removeClass('danger');
                 $(obj).parent().parent().addClass('warning');
