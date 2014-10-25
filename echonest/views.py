@@ -8,7 +8,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 
 from echonest import settings
-from echonest.controllers.ingest import process
+from echonest.controllers.ingest import process, find_track
 from echonest.models import Ingested
 
 
@@ -60,8 +60,9 @@ def ingester(request):
             track_id = process(ingested)
 
             if track_id is not None:
+                track = find_track(track_id)
+                ingested.tracks.add(track)
                 ingested.match = True
-                ingested.track_id = track_id
                 success.append(ingested)
             else:
                 uploaded_codes.append(ingested)
@@ -106,7 +107,8 @@ def retry(request, ingested_id):
     track_id = process(ingested)
 
     if track_id is not None:
-        ingested.track_id = track_id
+        track = find_track(track_id)
+        ingested.tracks.add(track)
         ingested.match = True
 
     ingested.last_attempt = datetime.datetime.now().date()

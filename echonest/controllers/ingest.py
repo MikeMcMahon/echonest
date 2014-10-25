@@ -6,6 +6,7 @@ import json
 import urllib2
 import time
 from echonest import settings
+from echonest.models import MatchedTrack
 
 import fp
 
@@ -27,3 +28,20 @@ def process(ingest, retry=0):
         json_data['track_id'] = response.TRID
 
     return json_data['track_id']
+
+
+def find_track(track_id):
+    """
+    Finds or creates the specified track id so that it may be associated with an ingested code
+    :param track_id:
+    :return:
+    """
+    tracks = MatchedTrack.objects.filter(track_id=track_id)
+    if len(tracks) == 0:
+        track = MatchedTrack()
+        track.track_id = track_id
+        track.save()
+    else:
+        track = tracks[0]
+
+    return track
