@@ -58,6 +58,7 @@ def ingester(request):
 
             ingested.filename = f['metadata']['filename']
             ingested.code = f['code']
+            ingested.save()
             track_id = process(ingested)
 
             if track_id is not None:

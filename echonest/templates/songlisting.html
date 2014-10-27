@@ -4,7 +4,6 @@
         {% csrf_token %}
         <div class="col-md-12">
             <h3>{{ title }}</h3>
-
             <div class="pagination">
                 <div class="current">
                     Page {{ songs.number }} of {{ songs.paginator.num_pages }}.
@@ -48,7 +47,6 @@
                     {% else %}
                         <a href="?page={{ songs.number }}&sort=last_attempt&dir=desc">Last Attempt</a>
                     {% endif %}
-
                     </td>
                     <td>Filename</td>
                     <td></td>
