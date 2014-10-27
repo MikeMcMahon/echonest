@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="3811405880">
+  <component name="DataSourceManagerImpl" format="xml" hash="2623273229">
     <data-source source="LOCAL" name="Django default" uuid="72438962-5b51-4109-a76e-ca8d18082a0e">
       <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:D:\Users\Family\PyCharmProjects\echonest\db.sqlite3</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/db.sqlite3</jdbc-url>
       <libraries />
     </data-source>
   </component>

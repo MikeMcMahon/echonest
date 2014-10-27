@@ -12,7 +12,6 @@
                     <td>Filename</td>
                     <td></td>
                     <td></td>
-                    <td></td>
                 </tr>
                 </thead>
                 <tbody>
@@ -21,13 +20,22 @@
                         <td>{{ s.uploaded_on }}</td>
                         <td id="la_{{ s.id }}">{{ s.last_attempt }}</td>
                         <td>{{ s.filename }}</td>
-                        <td id="trid_{{ s.id }}" >{{ s.track_id }}</td>
                         <td id="match_{{ s.id }}">{% if s.match %}
-                            <a href="{{ s.solr_url }}" target="_blank" title="View In Solr"><span class="glyphicon glyphicon-new-window"></span></a>
+                            <div class="dropdown">
+                                <a data-toggle="dropdown" href="#">Track(s) <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                    {% for t in s.tracks.all %}
+                                        <li><a href="{{ t.solr_url }}" target="_blank" title="View In Solr">
+                                            <span class="glyphicon glyphicon-new-window"></span> {{ t.track_id }}
+                                        </a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                         {% endif %}
                         </td>
-                        <td>{% if not s.match %}<a onclick="retry(this, '{{ s.id }}')" href="javascript://" title="Retry">
-                            <span class="glyphicon glyphicon-repeat"></span></a>{% endif %}</td>
+                        <td>{% if not s.match %}
+                            <a onclick="retry(this, '{{ s.id }}')" href="javascript://" title="Retry">
+                                <span class="glyphicon glyphicon-repeat"></span></a>{% endif %}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -37,6 +45,10 @@
     <script type="text/javascript">
         function retry(obj, ingested_id) {
             var csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+            $(obj).parent().parent().removeClass('info');
+            $(obj).parent().parent().removeClass('success');
+            $(obj).parent().parent().removeClass('danger');
+            $(obj).parent().parent().removeClass('warning');
             $(obj).parent().parent().addClass('info');
             $.ajax({
                 url: '/retry/' + ingested_id,
@@ -44,20 +56,16 @@
                 data: {csrfmiddlewaretoken: csrftoken}
             }).done(function (data) {
                 $(obj).parent().parent().removeClass('info');
-                $(obj).parent().parent().removeClass('success');
                 $(obj).parent().parent().removeClass('danger');
                 var results = JSON.parse(data);
                 if (results['status'] === 'success') {
                     $(obj).parent().parent().addClass('success');
-                    $("#trid_" + ingested_id).text(results['track_id']);
-                    $("#match_" + ingested_id).html(
-                            '<a href="' + results['solr_url'] + '" target="_blank"><span class="glyphicon glyphicon-new-window"></span></a>');
                 } else {
                     $(obj).parent().parent().addClass('danger');
                 }
 
                 $("#la_" + ingested_id).text(results['last_attempt']);
-            }).error(function() {
+            }).error(function () {
                 $(obj).parent().parent().removeClass('info');
                 $(obj).parent().parent().removeClass('success');
                 $(obj).parent().parent().removeClass('danger');

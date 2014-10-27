@@ -4,14 +4,11 @@ from echonest import settings
 
 
 class MatchedTrack(models.Model):
-    track_id = models.TextField(max_length=255)
+    track_id = models.TextField(max_length=255, unique=True)
     found_on = models.DateField(default=datetime.datetime.now().date())
 
     def solr_url(self):
-                return '' if not self.match else settings.REMOTE_SOLR_URL.format(self.track_id)
-
-    def ingested(self):
-        return Ingested.objects.filter(tracks__id=self.id)
+                return settings.REMOTE_SOLR_URL.format(self.track_id)
 
 
 class Ingested(models.Model):

@@ -2,7 +2,7 @@
 BEGIN;
 CREATE TABLE "echonest_matchedtrack" (
     "id" serial NOT NULL PRIMARY KEY,
-    "track_id" text NOT NULL,
+    "track_id" text NOT NULL UNIQUE,
     "found_on" date NOT NULL
 )
 ;

@@ -98,11 +98,24 @@ def song_listing(request, reason):
 @never_cache
 @csrf_protect
 def retry(request, ingested_id):
+    """
+    Attempts to retry a song unless we've already done this before, then just give me what we have...
+    :param request:
+    :param ingested_id:
+    :return:
+    """
     ingested = Ingested.objects.filter(id=ingested_id)
     if len(ingested) != 1:
         return HttpResponse(json.dumps({'status': 'too many or too few matching songs'}))
     else:
         ingested = ingested[0]
+
+    if ingested.match:
+        return HttpResponse(json.dumps({
+            'track_id': [t.track_id for t in ingested.tracks],
+            'last_attempt': ingested.last_attempt,
+            'status': 'success',
+        }))
 
     track_id = process(ingested)
 
@@ -115,8 +128,7 @@ def retry(request, ingested_id):
     ingested.save()
 
     return HttpResponse(json.dumps({
-        'track_id': track_id,
-        'solr_url': ingested.solr_url(),
+        'track_id': [track_id],
         'last_attempt': ingested.last_attempt.strftime('%b. %d, %Y'),
         'status': 'success' if track_id is not None else 'failed',
         }))
