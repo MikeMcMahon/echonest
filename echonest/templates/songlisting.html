@@ -6,15 +6,21 @@
             <h3>{{ title }}</h3>
 
             <div class="pagination">
+                <div class="current">
+                        Page {{ songs.number }} of {{ songs.paginator.num_pages }}.
+                </div>
                 <span class="step-links">
                     {% if songs.has_previous %}
+                        <a href="?page=0">&lt;&lt;</a>
                         <a href="?page={{ songs.previous_page_number }}">previous</a>
-                    {% endif %}
-                    <span class="current">
-                        Page {{ songs.number }} of {{ songs.paginator.num_pages }}.
-                    </span>
+                    {% else %}
+                        <span>&lt;&lt; previous</span>
+                    {% endif %} |
                     {% if songs.has_next %}
                         <a href="?page={{ songs.next_page_number }}">next</a>
+                        <a href="?page={{ songs.paginator.num_pages }}">&gt;&gt;</a>
+                    {% else %}
+                        <span>next &gt;&gt;</span>
                     {% endif %}
                 </span>
             </div>
