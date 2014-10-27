@@ -16,26 +16,4 @@ CREATE TABLE "echonest_ingested_tracks" (
 
 CREATE INDEX "echonest_ingested_tracks_8336a855" ON "echonest_ingested_tracks" ("ingested_id");
 CREATE INDEX "echonest_ingested_tracks_cacbcceb" ON "echonest_ingested_tracks" ("matchedtrack_id");
-
--- MIGRATE THE DATA
--- popuplate the matched track table
-INSERT INTO echonest_matchedtrack (track_id, found_on)
-  (
-    SELECT DISTINCT
-      ei.track_id,
-      ei.uploaded_on
-    FROM echonest_ingested ei
-    WHERE ei.match = 1
-  )
-;
-
--- build out the table of actual ingested<->tracks
-INSERT INTO echonest_ingested_tracks (ingested_id, matchedtrack_id) (
-  SELECT ei.id, mt.id
-  FROM echonest_ingested ei
-  JOIN echonest_matchedtrack mt ON ei.track_id = mt.track_id
-  WHERE ei.match = 1
-)
-;
--- REMOVE THE OFFENDING COLUMN
-ALTER TABLE echonest_ingested DROP COLUMN IF EXISTS track_id;
+END;
