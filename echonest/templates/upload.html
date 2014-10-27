@@ -30,8 +30,8 @@
                 <h4>Succesful Matches</h4>
                 <div class="list-group">
                     {% for s in success %}
-                        <a href="{{ s.solr_url }}" class="list-group-item list-group-item-success"
-                           target="_blank">{{ s.track_id }}</a>
+                        <a href="/matched/" class="list-group-item list-group-item-success"
+                           target="_blank">{{ s.filename }}</a>
                     {% endfor %}
                 </div>
             {% endif %}
