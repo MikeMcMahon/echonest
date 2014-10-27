@@ -1,6 +1,7 @@
 import json
 import os
 import datetime
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse
 
 from django.shortcuts import render
@@ -89,9 +90,21 @@ def song_listing(request, reason):
 
     ingested = Ingested.objects.filter(match=match).order_by(order_by)
 
+    paginator = Paginator(ingested, 100)
+
+    page = request.GET.get('page')
+    try:
+        songs = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        songs = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        songs = paginator.page(paginator.num_pages)
+
     return render(request, 'songlisting.html', {
         'title': title,
-        'songs': ingested
+        'songs': songs
     })
 
 
