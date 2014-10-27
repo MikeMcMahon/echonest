@@ -82,13 +82,22 @@ def ingester(request):
 def song_listing(request, reason):
     match = True
     title = 'Matched Track Information'
-    order_by = '-uploaded_on'
+    order_by = 'uploaded_on'
     if reason == 'unmatched':
         match = False
         title = 'Unmatched Track Information'
-        order_by = '-last_attempt'
+        order_by = 'last_attempt'
 
-    ingested = Ingested.objects.filter(match=match).order_by(order_by)
+    sort_order_by = request.GET.get('sort')
+    sort_direction = request.GET.get('dir', 'desc')
+    if sort_direction == 'asc':
+        direction = ''
+    else:
+        direction = '-'
+
+    order_by = order_by if sort_order_by is None or sort_order_by == '' else sort_order_by
+    order_by = order_by.lstrip().rstrip()
+    ingested = Ingested.objects.filter(match=match).order_by(direction + order_by)
 
     paginator = Paginator(ingested, 100)
 
@@ -104,6 +113,8 @@ def song_listing(request, reason):
 
     return render(request, 'songlisting.html', {
         'title': title,
+        'order_by': order_by[1:] if order_by[0:1] == '-' else order_by,
+        'sort_direction': sort_direction,
         'songs': songs
     })
 

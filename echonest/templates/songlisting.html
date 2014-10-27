@@ -7,18 +7,18 @@
 
             <div class="pagination">
                 <div class="current">
-                        Page {{ songs.number }} of {{ songs.paginator.num_pages }}.
+                    Page {{ songs.number }} of {{ songs.paginator.num_pages }}.
                 </div>
                 <span class="step-links">
                     {% if songs.has_previous %}
-                        <a href="?page=0">&lt;&lt;</a>
-                        <a href="?page={{ songs.previous_page_number }}">previous</a>
+                        <a href="?page=0&sort={{ order_by }}&dir={{ sort_direction }}">&lt;&lt;</a>
+                        <a href="?page={{ songs.previous_page_number }}&sort={{ order_by }}&dir={{ sort_direction }}">previous</a>
                     {% else %}
                         <span>&lt;&lt; previous</span>
                     {% endif %} |
                     {% if songs.has_next %}
-                        <a href="?page={{ songs.next_page_number }}">next</a>
-                        <a href="?page={{ songs.paginator.num_pages }}">&gt;&gt;</a>
+                        <a href="?page={{ songs.next_page_number }}&sort={{ order_by }}&dir={{ sort_direction }}">next</a>
+                        <a href="?page={{ songs.paginator.num_pages }}&sort={{ order_by }}&dir={{ sort_direction }}">&gt;&gt;</a>
                     {% else %}
                         <span>next &gt;&gt;</span>
                     {% endif %}
@@ -27,8 +27,29 @@
             <table class="table table-condensed table-responsive table-striped table-hover">
                 <thead>
                 <tr>
-                    <td>Uploaded</td>
-                    <td>Last Attempt</td>
+                    <td>
+                    {% if order_by == 'uploaded_on' %}
+                        <a href="?page={{ songs.number }}&sort=uploaded_on&dir={% if sort_direction == 'asc' %}desc{% else %}asc{% endif %}">Uploaded
+                        <span class="{% if sort_direction == 'asc' %}dropup{% endif %}">
+                            <span class="caret"></span>
+                        </span>
+                        </a>
+                    {% else %}
+                        <a href="?page={{ songs.number }}&sort=uploaded_on&dir=desc">Uploaded</a>
+                    {% endif %}
+                    </td>
+                    <td>
+                    {% if order_by == 'last_attempt' %}
+                        <a href="?page={{ songs.number }}&sort=last_attempt&dir={% if sort_direction == 'asc' %}desc{% else %}asc{% endif %}">Last Attempt
+                        <span class="{% if sort_direction == 'asc' %}dropup{% endif %}">
+                            <span class="caret"></span>
+                        </span>
+                        </a>
+                    {% else %}
+                        <a href="?page={{ songs.number }}&sort=last_attempt&dir=desc">Last Attempt</a>
+                    {% endif %}
+
+                    </td>
                     <td>Filename</td>
                     <td></td>
                     <td></td>
