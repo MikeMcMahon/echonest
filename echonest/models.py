@@ -5,6 +5,7 @@ from echonest import settings
 
 class MatchedTrack(models.Model):
     track_id = models.TextField(max_length=255, unique=True)
+    file_name = models.TextField(max_length=255, null=True)
     found_on = models.DateField(default=datetime.datetime.now().date())
 
     def solr_url(self):

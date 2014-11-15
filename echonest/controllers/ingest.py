@@ -44,4 +44,9 @@ def find_track(track_id):
     else:
         track = tracks[0]
 
+    if not settings.REMOTE_ENABLED:
+        response = fp.metadata_for_track_id(track_id)
+        track.file_name = response['filename']
+        track.save()
+
     return track
