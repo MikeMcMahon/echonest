@@ -14,7 +14,7 @@ class MatchedTrack(models.Model):
 class Ingested(models.Model):
     filename = models.TextField(max_length=1000)
     code = models.TextField()
-    uploaded_on = models.DateField(default=datetime.datetime.now().date())
-    last_attempt = models.DateField(default=datetime.datetime.now().date())
+    uploaded_on = models.DateTimeField(default=datetime.datetime.now())
+    last_attempt = models.DateTimeField(default=datetime.datetime.now())
     match = models.BooleanField(default=False)
     tracks = models.ManyToManyField('MatchedTrack', null=True)

@@ -62,8 +62,13 @@ def ingester(request):
             track_id = process(ingested)
 
             if track_id is not None:
-                track = find_track(track_id)
-                ingested.tracks.add(track)
+                if type(track_id) is list:
+                    for t_id in track_id:
+                        track = find_track(t_id)
+                        ingested.tracks.add(track)
+                else:
+                    track = find_track(track_id)
+                    ingested.tracks.add(track)
                 ingested.match = True
                 success.append(ingested)
             else:
@@ -149,7 +154,7 @@ def retry(request, ingested_id):
         ingested.tracks.add(track)
         ingested.match = True
 
-    ingested.last_attempt = datetime.datetime.now().date()
+    ingested.last_attempt = datetime.datetime.now()
     ingested.save()
 
     return HttpResponse(json.dumps({
