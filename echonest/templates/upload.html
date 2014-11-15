@@ -42,17 +42,16 @@
                         </div>
                     {% endfor %}
                     <script type="text/javascript">
+                        "use strict";
                         function attempt(track_id) {
                             $($("#" + track_id).children('span')[0]).addClass('glyphicon-ok');
                         }
                         function showAll(s_id) {
-                            $("#" + s_id).children('a[class=clickable]').each(function () {
-                                var new_loc = $(this).attr('href');
-                                window.open(new_loc);
-                                window.focus();
-                                $(this).click();
-                                //return false;
-                            });
+                            var kids = $("#" + s_id).children('a[class=clickable]');
+                            for (var i =0; i < kids.length; i++) {
+                                window.open($(kids[i]).attr('href'), '_blank');
+                                $(kids[i]).click();
+                            }
                         }
                     </script>
                 </div>
