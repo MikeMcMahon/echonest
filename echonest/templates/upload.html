@@ -32,7 +32,29 @@
                     {% for s in success %}
                         <a href="/matched/" class="list-group-item list-group-item-success"
                            target="_blank">{{ s.filename }}</a>
+                        <div id="{{ s.id }}" clas="row" style="text-align: right;">
+                            <a href="javascript:showAll('{{ s.id }}');">Show All</a> <br/>
+                            {% for m in s.tracks.all %}
+                                <a id='{{ m.track_id }}' class="clickable" onclick="attempt('{{ m.track_id }}')"
+                                   href='{{ m.solr_url }}'
+                                   target="_blank"><span class="glyphicon"></span>{{ m.track_id }}</a> <br/>
+                            {% endfor %}
+                        </div>
                     {% endfor %}
+                    <script type="text/javascript">
+                        function attempt(track_id) {
+                            $($("#" + track_id).children('span')[0]).addClass('glyphicon-ok');
+                        }
+                        function showAll(s_id) {
+                            $("#" + s_id).children('a[class=clickable]').each(function () {
+                                var new_loc = $(this).attr('href');
+                                window.open(new_loc);
+                                window.focus();
+                                $(this).click();
+                                //return false;
+                            });
+                        }
+                    </script>
                 </div>
             {% endif %}
         </div>
