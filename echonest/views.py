@@ -21,6 +21,14 @@ def handle_upload_file(f):
 
     return file_name
 
+@csrf_protect
+@never_cache
+def login(request):
+    return render(
+        request,
+        'login.html',
+        {}
+    )
 
 @csrf_protect
 @never_cache
