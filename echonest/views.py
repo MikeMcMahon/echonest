@@ -118,13 +118,16 @@ def process_mp3_uploads(request, input_files):
     json_to_parse = []
     for f in uploaded_files:
         try:
-            codegen_output = subprocess.call(["/root/echoprint-codegen/echoprint-codegen", f[1]])
-        except:
+            codegen_output = subprocess.Popen(["/data/echoprint-codegen/echoprint-codegen", f[1]], stdout=subprocess.PIPE)
+            stdoutdata, stderrdata = codegen_output.communicate()
+        except Exception as ex:
+            f[0].name += "--subprocess-call--" + str(ex)
             rejected_files.append(f[0])
         else:
             try:
-                json_to_parse = json.loads(codegen_output)
-            except:
+                json_to_parse = json.loads(stdoutdata)
+            except Exception as ex:
+                f[0].name += "--parsing-the-json--" + str(ex) + "--" + str(stdoutdata) + str(stderrdata)
                 rejected_files.append(f[0])
 
         try:
