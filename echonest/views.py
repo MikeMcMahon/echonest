@@ -19,6 +19,11 @@ from string import ascii_letters
 
 def handle_upload_file(f):
     seed = ascii_letters + "01234567890-_"
+    size = f.size / 1024.0 / 1024.0
+
+    if size > 10:
+        return None
+
     f_name = ''.join(seed[random.randrange(0, len(seed) - 1)] for x in range(30))
     file_name = os.path.join(settings.UPLOADS_DIR, f_name)
 
@@ -45,7 +50,11 @@ def get_uploaded_files(input_files, extension='.json'):
     for f in input_files:
         if f.name.endswith(extension):
             file_name = handle_upload_file(f)
-            uploaded_files.append((f, file_name))
+            if file_name:
+                uploaded_files.append((f, file_name))
+            else:
+                # TODO - we should have legit reasons
+                rejected_files.append(f)
         else:
             rejected_files.append(f)
     return uploaded_files, rejected_files
@@ -136,6 +145,11 @@ def process_mp3_uploads(request, input_files):
             pass
 
     process_ingested_json(json_to_parse, rejected_files, success, uploaded_codes)
+
+    for s in success:
+        for uf in uploaded_files:
+            if uf[0] == s.filename:
+                s.filename = uf[0]
 
     return render(request, 'upload.html', {
         'mode': 'mp3',
