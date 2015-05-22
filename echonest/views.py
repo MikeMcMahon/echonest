@@ -1,25 +1,33 @@
 import json
 import os
 import datetime
+import random
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse
 
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
+import subprocess
 
 from echonest import settings
 from echonest.controllers.ingest import process, find_track
 from echonest.models import Ingested
 
+from string import ascii_letters
+
 
 def handle_upload_file(f):
-    file_name = os.path.join(settings.UPLOADS_DIR, f.name)
-    with open(os.path.join(settings.UPLOADS_DIR, f.name), 'wb+') as destination:
+    seed = ascii_letters + "01234567890-_"
+    f_name = ''.join(seed[random.randrange(0, len(seed) - 1)] for x in range(30))
+    file_name = os.path.join(settings.UPLOADS_DIR, f_name)
+
+    with open(os.path.join(settings.UPLOADS_DIR, f_name), 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
     return file_name
+
 
 @csrf_protect
 @never_cache
@@ -30,64 +38,140 @@ def login(request):
         {}
     )
 
-@csrf_protect
-@never_cache
-def ingester(request):
+
+def get_uploaded_files(input_files, extension='.json'):
+    uploaded_files = []
     rejected_files = []
-    uploaded_codes = []
-    success = []
+    for f in input_files:
+        if f.name.endswith(extension):
+            file_name = handle_upload_file(f)
+            uploaded_files.append((f, file_name))
+        else:
+            rejected_files.append(f)
+    return uploaded_files, rejected_files
 
-    if request.method == 'POST':
-        uploaded_files = []
-        input_files = request.FILES.getlist('input_file')
-        for f in input_files:
-            if f.name.endswith('.json'):
-                file_name = handle_upload_file(f)
-                uploaded_files.append((f, file_name))
-            else:
-                rejected_files.append(f)
 
-        json_to_parse = []
-        for f in uploaded_files:
-            with open(f[1], 'rb') as input_json_file:
-                try:
-                    input_json = json.load(input_json_file)
-                except:
-                    rejected_files.append(f[0])
-                else:
-                    json_to_parse = json_to_parse + input_json
+def process_ingested_json(json_to_parse, rejected_files, success, uploaded_codes):
+    for f in json_to_parse:
+        ingested = Ingested()
 
-        for f in json_to_parse:
-            ingested = Ingested()
+        if 'metadata' not in f or 'filename' not in f['metadata'] or 'code' not in f:
+            rejected_files.append({'name': 'failed to process json file, missing required fields'})
+            continue
 
-            if 'metadata' not in f or 'filename' not in f['metadata'] or 'code' not in f:
-                rejected_files.append({'name': 'failed to process json file, missing required fields'})
-                continue
+        ingested.filename = f['metadata']['filename']
+        ingested.code = f['code']
+        ingested.save()
+        track_id = process(ingested)
 
-            ingested.filename = f['metadata']['filename']
-            ingested.code = f['code']
-            ingested.save()
-            track_id = process(ingested)
-
-            if track_id is not None:
-                if type(track_id) is list:
-                    for t_id in track_id:
-                        track = find_track(t_id)
-                        ingested.tracks.add(track)
-                else:
-                    track = find_track(track_id)
+        if track_id is not None:
+            if type(track_id) is list:
+                for t_id in track_id:
+                    track = find_track(t_id)
                     ingested.tracks.add(track)
-                ingested.match = True
-                success.append(ingested)
             else:
-                uploaded_codes.append(ingested)
+                track = find_track(track_id)
+                ingested.tracks.add(track)
+            ingested.match = True
+            success.append(ingested)
+        else:
+            uploaded_codes.append(ingested)
 
-            ingested.save()
+        ingested.save()
+
+
+def process_json_uploads(request, input_files):
+    uploaded_files, rejected_files = get_uploaded_files(input_files)
+    success = []
+    uploaded_codes = []
+
+    json_to_parse = []
+    for f in uploaded_files:
+        with open(f[1], 'rb') as input_json_file:
+            try:
+                input_json = json.load(input_json_file)
+            except:
+                rejected_files.append(f[0])
+            else:
+                json_to_parse = json_to_parse + input_json
+        try:
+            os.remove(f[1])
+        except:
+            pass
+
+    process_ingested_json(json_to_parse, rejected_files, success, uploaded_codes)
 
     return render(request, 'upload.html', {
+        'mode': 'json',
+        'lawl': 'JSONS',
         'uploaded': uploaded_codes,
         'success': success,
         'rejected': rejected_files,
+    })
+
+
+def process_mp3_uploads(request, input_files):
+    uploaded_files, rejected_files = get_uploaded_files(input_files, '.mp3')
+    success = []
+    uploaded_codes = []
+
+    json_to_parse = []
+    for f in uploaded_files:
+        try:
+            codegen_output = subprocess.call(["/root/echonest-codegen/echonest-codegen", f[1]])
+        except:
+            rejected_files.append(f[0])
+
+        try:
+            json_to_parse = json.loads(codegen_output)
+        except:
+            rejected_files.append(f[0])
+
+        try:
+            os.remove(f[1])
+        except:
+            pass
+
+    process_ingested_json(json_to_parse, rejected_files, success, uploaded_codes)
+
+        # with open(f[1], 'rb') as input_mp3:
+        #     try:
+        #         input_json = json.load(input_json_file)
+        #     except:
+        #         rejected_files.append(f[0])
+        #     else:
+        #         json_to_parse = json_to_parse + input_json
+        # try:
+        #     os.remove(f[1])
+        # except:
+        #     pass
+
+    return render(request, 'upload.html', {
+        'mode': 'mp3',
+        'lawl': 'em pee threes',
+        'uploaded': uploaded_codes,
+        'success': success,
+        'rejected': rejected_files,
+    })
+
+@csrf_protect
+@never_cache
+def ingester(request):
+    if request.method == 'POST':
+        ingest_mode = request.POST.get('mode', None)
+
+        input_files = request.FILES.getlist('input_files')
+
+        if ingest_mode == 'json':
+            return process_json_uploads(request, input_files)
+
+        if ingest_mode == 'mp3':
+            return process_mp3_uploads(request, input_files)
+
+    return render(request, 'upload.html', {
+        'uploaded': [],
+        'success': [],
+        'rejected': [],
     })
 
 

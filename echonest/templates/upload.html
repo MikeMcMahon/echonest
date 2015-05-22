@@ -5,17 +5,37 @@
         <div class="col-sm-12 col-md-6 col-md-offset-3">
             {% if rejected %}
                 <div class="alert alert-danger">
-                    <strong>Oh Shit Son</strong>... It looks like some JSONS are gay.
+                    <strong>Oh Shit Son</strong>... It looks like some {{ lawl }} are gay.
                 </div>
             {% endif %}
-            <div class="panel panel-default">
-                <div class="panel-heading">Upload your JSON</div>
-                <div class="panel-body">
+            <div role="tabpanel">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" {% if mode == 'json' or not mode %}class="active"{% endif %}><a href="#json" aria-controls="json" role="tab"
+                                                              data-toggle="tab">Upload JSON</a></li>
+                    <li role="presentation" {% if mode == 'mp3' %}class="active"{% endif %}><a href="#mp3" aria-controls="mp3" role="tab" data-toggle="tab">Upload
+                        MP3</a></li>
+                </ul>
+            </div>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane fade {% if mode == 'json' or not mode %}in active{% endif %}" id="json">
                     <form method="post" action="." id="uploader" enctype="multipart/form-data">
                         {% csrf_token %}
+                        <input type="hidden" id="mode" name="mode" value="json" />
                         <div class="form-group">
-                            <label for="input_file">Ingestable Files</label>
-                            <input type="file" id="input_file" name="input_file" multiple/>
+                            <label for="input_file">Ingestable JSON</label>
+                            <input type="file" id="input_files" name="input_files" multiple/>
+                        </div>
+                        <br/>
+                        <input type="submit" class="btn btn-default btn-block"/>
+                    </form>
+                </div>
+                <div role="tabpanel" class="tab-pane fade {% if mode == 'mp3' %}in active{% endif %}" id="mp3">
+                    <form method="post" action="." id="uploader" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" id="mode" name="mode" value="mp3" />
+                        <div class="form-group">
+                            <label for="input_file">MP3 Clip</label>
+                            <input type="file" id="input_file" name="input_files"/>
                         </div>
                         <br/>
                         <input type="submit" class="btn btn-default btn-block"/>
@@ -48,7 +68,7 @@
                         }
                         function showAll(s_id) {
                             var kids = $("#" + s_id).children('a[class=clickable]');
-                            for (var i =0; i < kids.length; i++) {
+                            for (var i = 0; i < kids.length; i++) {
                                 window.open($(kids[i]).attr('href'), '_blank');
                                 $(kids[i]).click();
                             }
