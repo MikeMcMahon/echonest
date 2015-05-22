@@ -148,13 +148,15 @@ def process_mp3_uploads(request, input_files):
 
     for s in success:
         for uf in uploaded_files:
-            if uf[0] == s.filename:
+            if uf[1] in s.filename:
                 s.filename = uf[0]
+                s.save()
 
     for rf in range(len(uploaded_codes)):
         for uf in uploaded_files:
-            if uf[0] == uploaded_codes[rf]:
-                uploaded_codes[rf] = uf[0]
+            if uf[1] in uploaded_codes[rf].filename:
+                uploaded_codes[rf].filename = uf[0]
+                uploaded_codes[rf].save()
 
     return render(request, 'upload.html', {
         'mode': 'mp3',
