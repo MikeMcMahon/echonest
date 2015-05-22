@@ -118,14 +118,14 @@ def process_mp3_uploads(request, input_files):
     json_to_parse = []
     for f in uploaded_files:
         try:
-            codegen_output = subprocess.call(["/root/echonest-codegen/echonest-codegen", f[1]])
+            codegen_output = subprocess.call(["/root/echoprint-codegen/echoprint-codegen", f[1]])
         except:
             rejected_files.append(f[0])
-
-        try:
-            json_to_parse = json.loads(codegen_output)
-        except:
-            rejected_files.append(f[0])
+        else:
+            try:
+                json_to_parse = json.loads(codegen_output)
+            except:
+                rejected_files.append(f[0])
 
         try:
             os.remove(f[1])
@@ -133,18 +133,6 @@ def process_mp3_uploads(request, input_files):
             pass
 
     process_ingested_json(json_to_parse, rejected_files, success, uploaded_codes)
-
-        # with open(f[1], 'rb') as input_mp3:
-        #     try:
-        #         input_json = json.load(input_json_file)
-        #     except:
-        #         rejected_files.append(f[0])
-        #     else:
-        #         json_to_parse = json_to_parse + input_json
-        # try:
-        #     os.remove(f[1])
-        # except:
-        #     pass
 
     return render(request, 'upload.html', {
         'mode': 'mp3',
