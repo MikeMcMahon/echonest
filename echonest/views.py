@@ -162,7 +162,7 @@ def process_mp3_uploads(request, input_files):
     return render(request, 'upload.html', {
         'mode': 'mp3',
         'lawl': 'em pee threes',
-        'track_ids': [s.track_id for s in success],
+        'track_ids': '|'.join([m.track_id for s in success for m in s.tracks.all()]),
         'uploaded': uploaded_codes,
         'success': success,
         'rejected': rejected_files,
