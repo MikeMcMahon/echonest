@@ -114,6 +114,7 @@ def process_json_uploads(request, input_files):
         'mode': 'json',
         'lawl': 'JSONS',
         'uploaded': uploaded_codes,
+        'track_ids': '|'.join([m.track_id for s in success for m in s.tracks.all()]),
         'success': success,
         'rejected': rejected_files,
     })
@@ -161,6 +162,7 @@ def process_mp3_uploads(request, input_files):
     return render(request, 'upload.html', {
         'mode': 'mp3',
         'lawl': 'em pee threes',
+        'track_ids': [s.track_id for s in success],
         'uploaded': uploaded_codes,
         'success': success,
         'rejected': rejected_files,

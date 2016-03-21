@@ -53,6 +53,8 @@
                         <a href="/matched/" class="list-group-item list-group-item-success"
                            target="_blank">{{ s.filename }}</a>
                         <div id="{{ s.id }}" clas="row" style="text-align: right;">
+                            <a href="http://localhost/?trackids={{ track_ids }}" target="_blank">Play All</a>
+                            <br />
                             <a href="javascript:showAll('{{ s.id }}');">Show All</a> <br/>
                             {% for m in s.tracks.all %}
                                 <a id='{{ m.track_id }}' class="clickable" onclick="attempt('{{ m.track_id }}')"
@@ -66,6 +68,7 @@
                         function attempt(track_id) {
                             $($("#" + track_id).children('span')[0]).addClass('glyphicon-ok');
                         }
+
                         function showAll(s_id) {
                             var kids = $("#" + s_id).children('a[class=clickable]');
                             for (var i = 0; i < kids.length; i++) {
